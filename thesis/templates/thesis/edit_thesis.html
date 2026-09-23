@@ -1,0 +1,134 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Edit Thesis | Student Thesis Management System</title>
+
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+</head>
+
+<body>
+
+<nav class="navbar">
+
+    <a href="{% url 'home' %}" class="brand">
+        Student <span>Thesis Management</span>
+    </a>
+
+    <div class="nav-links">
+
+        <a href="{% url 'home' %}" class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">Dashboard</a>
+
+        <a href="{% url 'thesis_list' %}" class="nav-link {% if request.resolver_match.url_name == 'thesis_list' %}active{% endif %}">
+            {% if user.profile.role == 'admin' %}All Theses{% else %}My Thesis{% endif %}
+        </a>
+
+        {% if user.profile.role != 'admin' %}
+        <a href="{% url 'add_thesis' %}" class="nav-link {% if request.resolver_match.url_name == 'add_thesis' %}active{% endif %}">Add Thesis</a>
+        {% endif %}
+
+        {% if user.profile.role == 'admin' %}
+        <a href="{% url 'all_students' %}" class="nav-link {% if request.resolver_match.url_name == 'all_students' %}active{% endif %}">All Students</a>
+        {% endif %}
+
+        <a href="{% url 'profile' %}" class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">Profile</a>
+
+        <div class="user-badge">
+            <span>{{ user.username }}</span>
+            <span class="role-tag {% if user.profile.role == 'admin' %}role-admin{% else %}role-student{% endif %}">
+                {% if user.profile.role == 'admin' %}Admin{% else %}Student{% endif %}
+            </span>
+        </div>
+
+        <form method="post" action="{% url 'logout' %}" class="logout-form">
+            {% csrf_token %}
+            <button type="submit" class="logout-btn">Logout</button>
+        </form>
+
+    </div>
+
+</nav>
+
+{% if messages %}
+    <div class="alerts">
+        {% for message in messages %}
+            <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-{{ message.tags }}{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<main class="container narrow">
+
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Edit Thesis</h1>
+            <p class="page-subtitle">Update the information of this thesis record</p>
+        </div>
+    </div>
+
+    <section class="card">
+
+        <div class="card-header">
+            <h2>{{ thesis.title }}</h2>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data">
+
+            {% csrf_token %}
+
+            <div style="padding: 26px;">
+
+                {% for field in form %}
+
+                    <div class="form-group">
+
+                        <label for="{{ field.id_for_label }}">
+                            {{ field.label }}
+                            {% if field.field.required %}<span class="required">*</span>{% endif %}
+                        </label>
+
+                        {{ field }}
+
+                        {% if field.name == 'status' and not is_admin %}
+                            <div class="help-text">Only an admin can change the thesis status.</div>
+                        {% endif %}
+
+                        {% if field.help_text %}
+                            <div class="help-text">{{ field.help_text }}</div>
+                        {% endif %}
+
+                        {% for error in field.errors %}
+                            <div class="field-error">{{ error }}</div>
+                        {% endfor %}
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+            <div style="display: flex; gap: 10px; padding: 20px 26px; background: #fafbfc; border-top: 1px solid #e7eaed;">
+
+                <a href="{% url 'thesis_detail' thesis.id %}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+
+            </div>
+
+        </form>
+
+    </section>
+
+</main>
+
+
+<footer class="footer">
+    Student Thesis Management System
+</footer>
+
+</body>
+</html>

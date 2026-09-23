@@ -1,0 +1,134 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Profile | Student Thesis Management System</title>
+
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <a href="{% url 'home' %}" class="brand">
+            Student <span>Thesis Management</span>
+        </a>
+
+        <div class="nav-links">
+
+            <a href="{% url 'home' %}" class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">Dashboard</a>
+
+            <a href="{% url 'thesis_list' %}" class="nav-link {% if request.resolver_match.url_name == 'thesis_list' %}active{% endif %}">
+                {% if user.profile.role == 'admin' %}All Theses{% else %}My Thesis{% endif %}
+            </a>
+
+            {% if user.profile.role != 'admin' %}
+            <a href="{% url 'add_thesis' %}" class="nav-link {% if request.resolver_match.url_name == 'add_thesis' %}active{% endif %}">Add Thesis</a>
+            {% endif %}
+
+            {% if user.profile.role == 'admin' %}
+            <a href="{% url 'all_students' %}" class="nav-link {% if request.resolver_match.url_name == 'all_students' %}active{% endif %}">All Students</a>
+            {% endif %}
+
+            <a href="{% url 'profile' %}" class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">Profile</a>
+
+            <div class="user-badge">
+                <span>{{ user.username }}</span>
+                <span class="role-tag {% if user.profile.role == 'admin' %}role-admin{% else %}role-student{% endif %}">
+                    {% if user.profile.role == 'admin' %}Admin{% else %}Student{% endif %}
+                </span>
+            </div>
+
+            <form method="post" action="{% url 'logout' %}" class="logout-form">
+                {% csrf_token %}
+                <button type="submit" class="logout-btn">Logout</button>
+            </form>
+
+        </div>
+
+    </nav>
+
+    {% if messages %}
+        <div class="alerts">
+            {% for message in messages %}
+                <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-{{ message.tags }}{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <main class="container narrow">
+
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">My Profile</h1>
+                <p class="page-subtitle">Your account information</p>
+            </div>
+        </div>
+
+        <section class="card">
+            <div class="card-header">
+                <h2>Account Details</h2>
+            </div>
+
+            <div style="padding: 24px;">
+
+                <div class="profile-item">
+                    <strong>Username</strong>
+                    <span>{{ user.username }}</span>
+                </div>
+
+                <div class="profile-item">
+                    <strong>Email</strong>
+                    <span>
+                        {% if user.email %}{{ user.email }}{% else %}No email added{% endif %}
+                    </span>
+                </div>
+
+                <div class="profile-item">
+                    <strong>Role</strong>
+                    <span class="role-tag {% if user.profile.role == 'admin' %}role-admin{% else %}role-student{% endif %}">
+                        {% if user.profile.role == 'admin' %}Admin{% else %}Student{% endif %}
+                    </span>
+                </div>
+
+                {% if user.profile.role != 'admin' %}
+                <div class="profile-item">
+                    <strong>University</strong>
+                    <span>{% if user.profile.university %}{{ user.profile.university }}{% else %}Not provided{% endif %}</span>
+                </div>
+
+                <div class="profile-item">
+                    <strong>Department</strong>
+                    <span>{% if user.profile.department %}{{ user.profile.department }}{% else %}Not provided{% endif %}</span>
+                </div>
+                {% endif %}
+
+                <div class="profile-item">
+                    <strong>Account Status</strong>
+                    <span>Active</span>
+                </div>
+
+            </div>
+
+        </section>
+
+        <div style="margin-top: 20px;">
+            <a href="{% url 'home' %}" class="btn btn-secondary">
+                Back to Dashboard
+            </a>
+        </div>
+
+    </main>
+
+    <footer class="footer">
+        Student Thesis Management System
+    </footer>
+
+</body>
+</html>

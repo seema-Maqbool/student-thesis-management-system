@@ -1,0 +1,242 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard | Student Thesis Management System</title>
+
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+</head>
+
+<body>
+
+<nav class="navbar">
+
+    <a href="{% url 'home' %}" class="brand">
+        Student <span>Thesis Management</span>
+    </a>
+
+    <div class="nav-links">
+
+        <a href="{% url 'home' %}" class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">Dashboard</a>
+
+        <a href="{% url 'thesis_list' %}" class="nav-link {% if request.resolver_match.url_name == 'thesis_list' %}active{% endif %}">
+            {% if user.profile.role == 'admin' %}All Theses{% else %}My Thesis{% endif %}
+        </a>
+
+        {% if user.profile.role != 'admin' %}
+        <a href="{% url 'add_thesis' %}" class="nav-link {% if request.resolver_match.url_name == 'add_thesis' %}active{% endif %}">Add Thesis</a>
+        {% endif %}
+
+        {% if user.profile.role == 'admin' %}
+        <a href="{% url 'all_students' %}" class="nav-link {% if request.resolver_match.url_name == 'all_students' %}active{% endif %}">All Students</a>
+        {% endif %}
+
+        <a href="{% url 'profile' %}" class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">Profile</a>
+
+        <div class="user-badge">
+            <span>{{ user.username }}</span>
+            <span class="role-tag {% if user.profile.role == 'admin' %}role-admin{% else %}role-student{% endif %}">
+                {% if user.profile.role == 'admin' %}Admin{% else %}Student{% endif %}
+            </span>
+        </div>
+
+        <form method="post" action="{% url 'logout' %}" class="logout-form">
+            {% csrf_token %}
+            <button type="submit" class="logout-btn">Logout</button>
+        </form>
+
+    </div>
+
+</nav>
+
+{% if messages %}
+    <div class="alerts">
+        {% for message in messages %}
+            <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-{{ message.tags }}{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<div class="container">
+
+    <div class="page-header">
+
+        <div>
+            <h1 class="page-title">Thesis Dashboard</h1>
+            <p class="page-subtitle">
+                {% if is_admin %}
+                    Manage and monitor student thesis records
+                {% else %}
+                    View and manage your thesis progress
+                {% endif %}
+            </p>
+        </div>
+
+        {% if not is_admin %}
+        <a href="{% url 'add_thesis' %}" class="btn btn-primary">
+            + Add New Thesis
+        </a>
+        {% endif %}
+
+    </div>
+
+
+    <div class="stats">
+
+        <div class="stat-card">
+            <h3>Total Thesis</h3>
+            <div class="number">{{ total_theses }}</div>
+        </div>
+
+        <div class="stat-card">
+            <h3>In Progress</h3>
+            <div class="number">{{ in_progress_count }}</div>
+        </div>
+
+        <div class="stat-card">
+            <h3>Submitted</h3>
+            <div class="number">{{ submitted_count }}</div>
+        </div>
+
+        <div class="stat-card">
+            <h3>Completed</h3>
+            <div class="number">{{ completed_count }}</div>
+        </div>
+
+    </div>
+
+
+    <div class="content-card">
+
+        <div class="card-header">
+            <h2 class="card-title">Thesis Records</h2>
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="Search thesis..."
+                style="padding: 9px 12px; width: 240px; border: 1px solid #d9dee3; border-radius: 5px; font-size: 14px;"
+            >
+        </div>
+
+        {% if theses %}
+
+        <div class="table-wrapper">
+
+            <table id="thesisTable">
+
+                <thead>
+                    <tr>
+                        <th>Thesis Title</th>
+                        <th>Student</th>
+                        <th>Supervisor</th>
+                        <th>Department</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for thesis in theses %}
+                    <tr>
+
+                        <td>{{ thesis.title }}</td>
+                        <td>{{ thesis.student_name }}</td>
+                        <td>{{ thesis.supervisor_name }}</td>
+                        <td>{{ thesis.department }}</td>
+
+                        <td>
+                            {% if thesis.status == "proposed" %}
+                                <span class="status proposed">Proposed</span>
+                            {% elif thesis.status == "approved" %}
+                                <span class="status approved">Approved</span>
+                            {% elif thesis.status == "in_progress" %}
+                                <span class="status in-progress">In Progress</span>
+                            {% elif thesis.status == "submitted" %}
+                                <span class="status submitted">Submitted</span>
+                            {% elif thesis.status == "under_review" %}
+                                <span class="status under-review">Under Review</span>
+                            {% elif thesis.status == "completed" %}
+                                <span class="status completed">Completed</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <div class="actions">
+
+                                <a href="{% url 'thesis_detail' thesis.pk %}" class="action view">View</a>
+                                <a href="{% url 'edit_thesis' thesis.pk %}" class="action edit">Edit</a>
+
+                                {% if is_admin %}
+                                <a href="{% url 'delete_thesis' thesis.pk %}" class="action delete">Delete</a>
+                                {% endif %}
+
+                            </div>
+                        </td>
+
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 30px;">
+                            No thesis records found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <div class="empty-state">
+            <h3>No Thesis Records Yet</h3>
+            <p>
+                {% if is_admin %}
+                    No students have submitted a thesis yet.
+                {% else %}
+                    You haven't added a thesis yet.
+                {% endif %}
+            </p>
+            {% if not is_admin %}
+            <a href="{% url 'add_thesis' %}" class="btn btn-primary">+ Add Your First Thesis</a>
+            {% endif %}
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<footer class="footer">
+    Student Thesis Management System &copy; 2026
+</footer>
+
+
+<script>
+    const searchInput = document.getElementById("searchInput");
+    const tableRows = document.querySelectorAll("#thesisTable tbody tr");
+
+    if (searchInput) {
+        searchInput.addEventListener("keyup", function () {
+            const searchValue = searchInput.value.toLowerCase();
+
+            tableRows.forEach(function (row) {
+                const rowText = row.textContent.toLowerCase();
+                row.style.display = rowText.includes(searchValue) ? "" : "none";
+            });
+        });
+    }
+</script>
+
+</body>
+</html>

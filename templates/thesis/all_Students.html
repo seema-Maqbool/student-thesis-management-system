@@ -1,0 +1,140 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>All Students | Student Thesis Management System</title>
+
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+</head>
+
+<body>
+
+<nav class="navbar">
+
+    <a href="{% url 'home' %}" class="brand">
+        Student <span>Thesis Management</span>
+    </a>
+
+    <div class="nav-links">
+
+        <a href="{% url 'home' %}" class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">Dashboard</a>
+
+        <a href="{% url 'thesis_list' %}" class="nav-link {% if request.resolver_match.url_name == 'thesis_list' %}active{% endif %}">
+            {% if user.profile.role == 'admin' %}All Theses{% else %}My Thesis{% endif %}
+        </a>
+
+        {% if user.profile.role != 'admin' %}
+        <a href="{% url 'add_thesis' %}" class="nav-link {% if request.resolver_match.url_name == 'add_thesis' %}active{% endif %}">Add Thesis</a>
+        {% endif %}
+
+        {% if user.profile.role == 'admin' %}
+        <a href="{% url 'all_students' %}" class="nav-link {% if request.resolver_match.url_name == 'all_students' %}active{% endif %}">All Students</a>
+        {% endif %}
+
+        <a href="{% url 'profile' %}" class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">Profile</a>
+
+        <div class="user-badge">
+            <span>{{ user.username }}</span>
+            <span class="role-tag {% if user.profile.role == 'admin' %}role-admin{% else %}role-student{% endif %}">
+                {% if user.profile.role == 'admin' %}Admin{% else %}Student{% endif %}
+            </span>
+        </div>
+
+        <form method="post" action="{% url 'logout' %}" class="logout-form">
+            {% csrf_token %}
+            <button type="submit" class="logout-btn">Logout</button>
+        </form>
+
+    </div>
+
+</nav>
+
+{% if messages %}
+    <div class="alerts">
+        {% for message in messages %}
+            <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-{{ message.tags }}{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<main class="container">
+
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">All Students</h1>
+            <p class="page-subtitle">List of all registered students and their thesis submissions</p>
+        </div>
+    </div>
+
+    <section class="content-card">
+
+        <div class="card-header">
+            <h2 class="card-title">Students</h2>
+            <div class="record-count">{{ student_data|length }} Student{{ student_data|length|pluralize }}</div>
+        </div>
+
+        {% if student_data %}
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>University</th>
+                        <th>Department</th>
+                        <th>Joined On</th>
+                        <th>Theses Submitted</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for entry in student_data %}
+                    <tr>
+
+                        <td style="font-weight: 650;">{{ entry.user.username }}</td>
+                        <td>{% if entry.user.email %}{{ entry.user.email }}{% else %}—{% endif %}</td>
+                        <td>{% if entry.user.profile.university %}{{ entry.user.profile.university }}{% else %}—{% endif %}</td>
+                        <td>{% if entry.user.profile.department %}{{ entry.user.profile.department }}{% else %}—{% endif %}</td>
+                        <td>{{ entry.user.date_joined|date:"d M Y" }}</td>
+                        <td>
+                            <span class="status approved">{{ entry.thesis_count }}</span>
+                        </td>
+
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <div class="empty-state">
+            <h3>No Students Found</h3>
+            <p>No student accounts have been registered yet.</p>
+        </div>
+
+        {% endif %}
+
+    </section>
+
+</main>
+
+
+<footer class="footer">
+    Student Thesis Management System
+</footer>
+
+</body>
+</html>

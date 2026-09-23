@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Thesis Details | Student Thesis Management System</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #f3f5f7;
+            color: #111111;
+            font-size: 16px;
+        }
+
+        .navbar {
+            height: 70px;
+            background: #17212b;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 45px;
+            color: white;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .brand {
+            font-size: 21px;
+            font-weight: 600;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            padding-bottom: 4px;
+            border-bottom: 2px solid transparent;
+        }
+
+        .nav-links a:hover {
+            color: #b9d7ee;
+        }
+
+        .nav-links a.active {
+            color: #9ec9e8;
+            font-weight: 700;
+            border-bottom: 2px solid #9ec9e8;
+        }
+
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            font-size: 14px;
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+        }
+
+        .role-tag {
+            padding: 3px 9px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .role-admin {
+            background: #2d7a4f;
+            color: white;
+        }
+
+        .role-student {
+            background: #3a5a78;
+            color: white;
+        }
+
+        .logout-form {
+            display: inline;
+            margin: 0;
+            padding: 0;
+        }
+
+        .logout-btn {
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 500;
+            font-family: inherit;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .logout-btn:hover {
+            color: #b9d7ee;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            padding: 40px 30px 60px;
+        }
+
+        .page-header {
+            margin-bottom: 28px;
+        }
+
+        .page-title {
+            margin: 0;
+            font-size: 31px;
+            color: #080808;
+        }
+
+        .page-subtitle {
+            margin-top: 8px;
+            color: #333333;
+            font-size: 17px;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #d6dbe0;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,.05);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 23px 28px;
+            background: #fafbfc;
+            border-bottom: 1px solid #dfe3e7;
+        }
+
+        .card-header h2 {
+            margin: 0;
+            font-size: 23px;
+            color: #080808;
+        }
+
+        .details {
+            padding: 10px 28px 25px;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 220px 1fr;
+            padding: 18px 0;
+            border-bottom: 1px solid #e3e6e8;
+        }
+
+        .row:last-child {
+            border-bottom: none;
+        }
+
+        .label {
+            font-weight: 700;
+            color: #222222;
+        }
+
+        .value {
+            color: #111111;
+            line-height: 1.6;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 6px 11px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .proposed {
+            background: #f1f1f1;
+            color: #222222;
+            border: 1px solid #cccccc;
+        }
+
+        .approved,
+        .in-progress {
+            background: #eef4f8;
+            color: #1f587f;
+            border: 1px solid #c5d8e6;
+        }
+
+        .submitted,
+        .under-review {
+            background: #f2f2f2;
+            color: #222222;
+            border: 1px solid #cccccc;
+        }
+
+        .completed {
+            background: #eaf3ed;
+            color: #205c36;
+            border: 1px solid #bfd8c7;
+        }
+
+        .description {
+            white-space: pre-line;
+        }
+
+        .document-link {
+            color: #1d5d87;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .document-link:hover {
+            text-decoration: underline;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            padding: 22px 28px;
+            background: #fafbfc;
+            border-top: 1px solid #dfe3e7;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 11px 18px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 600;
+            border: 1px solid transparent;
+            cursor: pointer;
+        }
+
+        .edit-btn {
+            background: #286b9f;
+            color: white;
+        }
+
+        .back-btn {
+            background: white;
+            color: #222222;
+            border: 1px solid #bfc5ca;
+        }
+
+        .delete-btn {
+            background: #fff7f7;
+            color: #8b1e1e;
+            border: 1px solid #d7aaaa;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 28px;
+            color: #444444;
+            font-size: 14px;
+        }
+
+        @media (max-width: 700px) {
+
+            .navbar {
+                height: auto;
+                padding: 18px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .nav-links {
+                gap: 18px;
+                flex-wrap: wrap;
+            }
+
+            .container {
+                padding: 25px 15px;
+            }
+
+            .row {
+                grid-template-columns: 1fr;
+                gap: 7px;
+            }
+
+            .actions {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<nav class="navbar">
+
+    <div class="brand">
+        Student Thesis Management System
+    </div>
+
+    <div class="nav-links">
+
+        <a href="{% url 'home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">Dashboard</a>
+
+        <a href="{% url 'thesis_list' %}" class="{% if request.resolver_match.url_name == 'thesis_list' %}active{% endif %}">
+            {% if user.profile.role == 'admin' %}All Theses{% else %}My Thesis{% endif %}
+        </a>
+
+        {% if user.profile.role != 'admin' %}
+        <a href="{% url 'add_thesis' %}" class="{% if request.resolver_match.url_name == 'add_thesis' %}active{% endif %}">Add Thesis</a>
+        {% endif %}
+
+        <a href="{% url 'profile' %}" class="{% if request.resolver_match.url_name == 'profile' %}active{% endif %}">Profile</a>
+        {% if user.profile.role == 'admin' %}
+        <a href="{% url 'all_students' %}" class="{% if request.resolver_match.url_name == 'all_students' %}active{% endif %}">All Students</a>
+        {% endif %}
+        <div class="user-badge">
+            <span>{{ user.username }}</span>
+            <span class="role-tag {% if user.profile.role == 'admin' %}role-admin{% else %}role-student{% endif %}">
+                {% if user.profile.role == 'admin' %}Admin{% else %}Student{% endif %}
+            </span>
+        </div>
+
+        <form method="post" action="{% url 'logout' %}" class="logout-form">
+            {% csrf_token %}
+            <button type="submit" class="logout-btn">Logout</button>
+        </form>
+
+    </div>
+
+</nav>
+
+
+<main class="container">
+
+    <div class="page-header">
+
+        <h1 class="page-title">
+            Thesis Details
+        </h1>
+
+        <p class="page-subtitle">
+            Complete information about the selected thesis
+        </p>
+
+    </div>
+
+
+    <section class="card">
+
+        <div class="card-header">
+
+            <h2>
+                {{ thesis.title }}
+            </h2>
+
+        </div>
+
+
+        <div class="details">
+
+                     <div class="row">
+                <div class="label">Status</div>
+
+                <div class="value">
+
+                    {% if is_admin %}
+
+                        <form method="POST" action="{% url 'update_status' thesis.id %}" style="display:flex; gap:8px; align-items:center;">
+
+                            {% csrf_token %}
+
+                            <input type="hidden" name="next" value="{% url 'thesis_detail' thesis.id %}">
+
+                            <select name="status" style="padding:8px 10px; border:1px solid #bfc5ca; border-radius:4px; font-size:14px;">
+                                <option value="proposed" {% if thesis.status == 'proposed' %}selected{% endif %}>Proposed</option>
+                                <option value="approved" {% if thesis.status == 'approved' %}selected{% endif %}>Approved</option>
+                                <option value="in_progress" {% if thesis.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                                <option value="submitted" {% if thesis.status == 'submitted' %}selected{% endif %}>Submitted</option>
+                                <option value="under_review" {% if thesis.status == 'under_review' %}selected{% endif %}>Under Review</option>
+                                <option value="completed" {% if thesis.status == 'completed' %}selected{% endif %}>Completed</option>
+                            </select>
+
+                            <button type="submit" class="btn edit-btn" style="padding:8px 14px; font-size:14px;">
+                                Update
+                            </button>
+
+                        </form>
+
+                    {% else %}
+
+                        {% if thesis.status == 'proposed' %}
+                            <span class="status proposed">Proposed</span>
+
+                        {% elif thesis.status == 'approved' %}
+                            <span class="status approved">Approved</span>
+
+                        {% elif thesis.status == 'in_progress' %}
+                            <span class="status in-progress">In Progress</span>
+
+                        {% elif thesis.status == 'submitted' %}
+                            <span class="status submitted">Submitted</span>
+
+                        {% elif thesis.status == 'under_review' %}
+                            <span class="status under-review">Under Review</span>
+
+                        {% elif thesis.status == 'completed' %}
+                            <span class="status completed">Completed</span>
+                        {% endif %}
+
+                    {% endif %}
+
+                </div>
+            </div>
+
+            <div class="row">
+
+                <div class="label">
+                    Description
+                </div>
+
+                <div class="value description">
+                    {% if thesis.description %}
+                        {{ thesis.description }}
+                    {% else %}
+                        No description provided.
+                    {% endif %}
+                </div>
+
+            </div>
+
+
+            <div class="row">
+
+                <div class="label">
+                    Thesis Document
+                </div>
+
+                <div class="value">
+
+                    {% if thesis.document %}
+
+                        <a href="{{ thesis.document.url }}" target="_blank" class="document-link">
+                            View / Download Document
+                        </a>
+
+                    {% else %}
+
+                        No document uploaded.
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <div class="row">
+
+                <div class="label">
+                    Added On
+                </div>
+
+                <div class="value">
+                    {{ thesis.created_at|date:"d M Y, h:i A" }}
+                </div>
+
+            </div>
+
+
+            <div class="row">
+
+                <div class="label">
+                    Last Updated
+                </div>
+
+                <div class="value">
+                    {{ thesis.updated_at|date:"d M Y, h:i A" }}
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="actions">
+
+            <a href="{% url 'thesis_list' %}" class="btn back-btn">
+                Back to List
+            </a>
+
+            <a href="{% url 'edit_thesis' thesis.id %}" class="btn edit-btn">
+                Edit Thesis
+            </a>
+
+            {% if is_admin %}
+            <a href="{% url 'delete_thesis' thesis.id %}" class="btn delete-btn">
+                Delete Thesis
+            </a>
+            {% endif %}
+
+            
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<footer class="footer">
+    Student Thesis Management System
+</footer>
+
+</body>
+</html>
